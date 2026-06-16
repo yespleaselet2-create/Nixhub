@@ -1,15 +1,107 @@
-﻿print('🔐 NIX HUB STARTING')
-
-if getgenv().NixHubLoaded then 
-    warn('Already loaded')
-    return 
-end
-getgenv().NixHubLoaded = true
+﻿-- NIX HUB LOADING SCREEN
+print('Loading...')
 
 local player = game:GetService('Players').LocalPlayer
 local playerGui = player:WaitForChild('PlayerGui')
 
--- KEY SYSTEM GUI
+-- CREATE LOADING SCREEN
+local loadGui = Instance.new('ScreenGui')
+loadGui.Name = 'LoadingScreen'
+loadGui.ResetOnSpawn = false
+loadGui.Parent = playerGui
+
+-- Background
+local bg = Instance.new('Frame')
+bg.Size = UDim2.new(1, 0, 1, 0)
+bg.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
+bg.BorderSizePixel = 0
+bg.Parent = loadGui
+
+-- Center container
+local container = Instance.new('Frame')
+container.Size = UDim2.new(0, 300, 0, 300)
+container.Position = UDim2.new(0.5, -150, 0.5, -150)
+container.BackgroundTransparency = 1
+container.Parent = loadGui
+
+-- Logo circle (PINK)
+local logo = Instance.new('Frame')
+logo.Size = UDim2.new(0, 150, 0, 150)
+logo.Position = UDim2.new(0.5, -75, 0.2, 0)
+logo.BackgroundColor3 = Color3.fromRGB(255, 100, 200)
+logo.BorderSizePixel = 0
+logo.Parent = container
+
+local logoCorner = Instance.new('UICorner')
+logoCorner.CornerRadius = UDim.new(1, 0)
+logoCorner.Parent = logo
+
+-- Inner logo design (lightning bolt style)
+local bolt = Instance.new('TextLabel')
+bolt.Size = UDim2.new(1, 0, 1, 0)
+bolt.BackgroundTransparency = 1
+bolt.Text = '⚡'
+bolt.TextColor3 = Color3.new(1, 1, 1)
+bolt.TextSize = 80
+bolt.Font = Enum.Font.GothamBold
+bolt.Parent = logo
+
+-- Loading text
+local loadText = Instance.new('TextLabel')
+loadText.Size = UDim2.new(1, 0, 0, 50)
+loadText.Position = UDim2.new(0, 0, 0.6, 0)
+loadText.BackgroundTransparency = 1
+loadText.Text = 'NIX HUB'
+loadText.TextColor3 = Color3.fromRGB(255, 100, 200)
+loadText.TextSize = 28
+loadText.Font = Enum.Font.GothamBold
+loadText.Parent = container
+
+-- Loading bar background
+local barBg = Instance.new('Frame')
+barBg.Size = UDim2.new(1, 0, 0, 8)
+barBg.Position = UDim2.new(0, 0, 0.8, 0)
+barBg.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
+barBg.BorderSizePixel = 0
+barBg.Parent = container
+
+-- Loading bar fill
+local barFill = Instance.new('Frame')
+barFill.Size = UDim2.new(0, 0, 1, 0)
+barFill.BackgroundColor3 = Color3.fromRGB(255, 100, 200)
+barFill.BorderSizePixel = 0
+barFill.Parent = barBg
+
+-- ANIMATION LOOP
+local rotation = 0
+local fillAmount = 0
+local animating = true
+
+while animating do
+    -- Rotate logo
+    rotation = (rotation + 5) % 360
+    logo.Rotation = rotation
+    
+    -- Fill loading bar
+    if fillAmount < 100 then
+        fillAmount = fillAmount + 0.5
+        barFill.Size = UDim2.new(fillAmount / 100, 0, 1, 0)
+    end
+    
+    -- When loaded
+    if fillAmount >= 100 then
+        wait(0.5)
+        animating = false
+    end
+    
+    wait(0.016) -- 60 FPS
+end
+
+-- FADE OUT
+wait(0.5)
+loadGui:Destroy()
+
+-- SHOW KEY SYSTEM
 local screenGui = Instance.new('ScreenGui')
 screenGui.Name = 'NixKeySystem'
 screenGui.ResetOnSpawn = false
@@ -28,7 +120,7 @@ corner.Parent = frame
 local title = Instance.new('TextLabel')
 title.Size = UDim2.new(1, 0, 0, 50)
 title.BackgroundTransparency = 1
-title.Text = '🔐 NIX HUB'
+title.Text = '🔐 KEY SYSTEM'
 title.TextColor3 = Color3.fromRGB(255, 100, 200)
 title.TextSize = 22
 title.Font = Enum.Font.GothamBold
@@ -50,84 +142,13 @@ btn.Text = 'VERIFY'
 btn.TextColor3 = Color3.new(0, 0, 0)
 btn.Parent = frame
 
-local verified = false
-
 btn.MouseButton1Click:Connect(function()
     if string.len(input.Text) == 10 then
-        verified = true
         screenGui:Destroy()
-        showHub()
+        print('✅ KEY VERIFIED')
     else
-        input.PlaceholderText = 'Invalid!'
+        input.PlaceholderText = 'Invalid key!'
     end
 end)
 
-function showHub()
-    print('✅ HUB LOADED')
-    
-    local hubGui = Instance.new('ScreenGui')
-    hubGui.Name = 'NixHub'
-    hubGui.ResetOnSpawn = false
-    hubGui.Parent = playerGui
-    
-    local hubFrame = Instance.new('Frame')
-    hubFrame.Size = UDim2.new(0, 500, 0, 400)
-    hubFrame.Position = UDim2.new(0.5, -250, 0.5, -200)
-    hubFrame.BackgroundColor3 = Color3.fromRGB(20, 20, 25)
-    hubFrame.Parent = hubGui
-    
-    local hubCorner = Instance.new('UICorner')
-    hubCorner.CornerRadius = UDim.new(0, 12)
-    hubCorner.Parent = hubFrame
-    
-    local hubTitle = Instance.new('TextLabel')
-    hubTitle.Size = UDim2.new(1, 0, 0, 50)
-    hubTitle.BackgroundColor3 = Color3.fromRGB(30, 30, 35)
-    hubTitle.Text = '⚔️ NIX HUB'
-    hubTitle.TextColor3 = Color3.fromRGB(255, 100, 200)
-    hubTitle.TextSize = 20
-    hubTitle.Font = Enum.Font.GothamBold
-    hubTitle.Parent = hubFrame
-    
-    -- AIMBOT BUTTON
-    local aimbotBtn = Instance.new('TextButton')
-    aimbotBtn.Size = UDim2.new(0, 180, 0, 50)
-    aimbotBtn.Position = UDim2.new(0.1, 0, 0.15, 0)
-    aimbotBtn.BackgroundColor3 = Color3.fromRGB(100, 200, 100)
-    aimbotBtn.Text = '🎯 AIMBOT'
-    aimbotBtn.TextColor3 = Color3.new(0, 0, 0)
-    aimbotBtn.Parent = hubFrame
-    
-    aimbotBtn.MouseButton1Click:Connect(function()
-        print('AIMBOT toggled')
-    end)
-    
-    -- SPEED BUTTON
-    local speedBtn = Instance.new('TextButton')
-    speedBtn.Size = UDim2.new(0, 180, 0, 50)
-    speedBtn.Position = UDim2.new(0.55, 0, 0.15, 0)
-    speedBtn.BackgroundColor3 = Color3.fromRGB(100, 150, 255)
-    speedBtn.Text = '⚡ SPEED'
-    speedBtn.TextColor3 = Color3.new(1, 1, 1)
-    speedBtn.Parent = hubFrame
-    
-    speedBtn.MouseButton1Click:Connect(function()
-        player.Character.Humanoid.WalkSpeed = 50
-        print('SPEED ON')
-    end)
-    
-    -- GOD MODE BUTTON
-    local godBtn = Instance.new('TextButton')
-    godBtn.Size = UDim2.new(0, 180, 0, 50)
-    godBtn.Position = UDim2.new(0.1, 0, 0.3, 0)
-    godBtn.BackgroundColor3 = Color3.fromRGB(255, 150, 100)
-    godBtn.Text = '🛡️ GOD MODE'
-    godBtn.TextColor3 = Color3.new(1, 1, 1)
-    godBtn.Parent = hubFrame
-    
-    godBtn.MouseButton1Click:Connect(function()
-        print('GOD MODE toggled')
-    end)
-end
-
-print('✅ NIX HUB READY')
+print('✅ Ready')
